@@ -1,0 +1,96 @@
+name: Sync & Build Podman from Upstream
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * *' # ogni giorno alle 3:00 UTC
+
+jobs:
+  sync-and-build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [amd64]
+
+    steps:
+      - name: Checkout empty action repo (forked)
+        uses: actions/checkout@v4
+
+      - name: Fetch latest release tag from upstream
+        id: get_tag
+        run: |
+          tag=$(curl -s https://api.github.com/repos/containers/podman/releases/latest | jq -r .tag_name)
+          version=$(echo "$tag" | sed 's/^v//')
+          echo "Ultima release: $tag"
+          echo "tag=$tag" >> $GITHUB_OUTPUT
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Clone Podman upstream source at tag
+        run: |
+          git clone --depth 1 --branch ${{ steps.get_tag.outputs.tag }} https://github.com/containers/podman.git source
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libseccomp-dev \
+            libapparmor-dev \
+            btrfs-progs \
+            libbtrfs-dev \
+            libgpgme-dev \
+            libsystemd-dev \
+            pkg-config \
+            make \
+            git \
+            dpkg-dev
+
+      - name: Compile Podman
+        working-directory: ./source
+        run: |
+          make clean
+          make BUILDTAGS="seccomp apparmor systemd" binaries
+          mkdir -p ../dist/amd64
+          cp bin/podman ../dist/amd64/podman
+
+      - name: Create tar.gz
+        run: |
+          cd dist/amd64
+          tar -czf ../../podman-amd64-${{ steps.get_tag.outputs.tag }}.tar.gz podman
+
+      - name: Create .deb package
+        run: |
+          mkdir -p pkg-deb/usr/local/bin
+          cp dist/amd64/podman pkg-deb/usr/local/bin/podman
+          mkdir -p pkg-deb/DEBIAN
+          cat <<EOF > pkg-deb/DEBIAN/control
+          Package: podman
+          Version: ${{ steps.get_tag.outputs.version }}
+          Section: utils
+          Priority: optional
+          Architecture: amd64
+          Maintainer: Your Name <you@example.com>
+          Description: Podman CLI built from upstream source
+          EOF
+          dpkg-deb --build pkg-deb podman-${{ steps.get_tag.outputs.version }}.deb
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: podman-artifacts
+          path: |
+            podman-amd64-${{ steps.get_tag.outputs.tag }}.tar.gz
+            podman-${{ steps.get_tag.outputs.version }}.deb
+
+      - name: Publish to release (if manual trigger)
+        if: github.event_name == 'workflow_dispatch'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.get_tag.outputs.tag }}
+          files: |
+            podman-*.tar.gz
+            podman-*.deb
