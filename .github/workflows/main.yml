@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: '0 3 * * *' # ogni giorno alle 3:00 UTC
 
+permissions:
+  contents: write
+  
 jobs:
   sync-and-build:
     runs-on: ubuntu-latest
