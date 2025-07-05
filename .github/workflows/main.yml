@@ -64,6 +64,11 @@ jobs:
             runc \
             uidmap
       
+      - name: Setup Go (latest version)
+        uses: actions/setup-go@v5
+        with:
+          go-version: 'latest'
+
       - name: Compile Podman
         working-directory: ./source
         run: |
