@@ -19,8 +19,8 @@ jobs:
     steps:
       - name: Install base dependencies
         run: |
-          apt-get update
-          apt-get install -y curl git jq ca-certificates
+          sudo apt-get update
+          sudo apt-get install -y curl git jq ca-certificates
 
       - name: Fetch latest release tag from upstream
         id: get_tag
@@ -37,8 +37,8 @@ jobs:
 
       - name: Install build dependencies
         run: |
-          apt-get update
-          apt-get install -y \
+          sudo apt-get update
+          sudo apt-get install -y \
             btrfs-progs \
             gcc \
             git \
