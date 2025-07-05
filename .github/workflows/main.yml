@@ -44,8 +44,6 @@ jobs:
             btrfs-progs \
             gcc \
             git \
-            golang-go \
-            go-md2man \
             iptables \
             libassuan-dev \
             libbtrfs-dev \
