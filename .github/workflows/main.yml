@@ -63,6 +63,12 @@ jobs:
             pkg-config \
             runc \
             uidmap
+         export GOPATH=~/go
+         git clone https://go.googlesource.com/go $GOPATH
+         cd $GOPATH
+         cd src
+         ./all.bash
+         export PATH=$GOPATH/bin:$PATH
 
       - name: Compile Podman
         working-directory: ./source
