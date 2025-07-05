@@ -11,8 +11,6 @@ permissions:
 jobs:
   sync-and-build:
     runs-on: ubuntu-latest
-    container:
-       image: debian:12
 
     strategy:
       matrix:
