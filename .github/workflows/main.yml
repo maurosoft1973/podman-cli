@@ -56,8 +56,7 @@ jobs:
             libselinux1-dev \
             libsystemd-dev \
             make \
-            netavark \
-            passt \
+            containernetworking-plugins \
             pkg-config \
             runc \
             uidmap
