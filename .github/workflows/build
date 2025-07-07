@@ -1,0 +1,62 @@
+name: Build Podman from Upstream
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * *' # ogni giorno alle 3:00 UTC
+
+permissions:
+  contents: write
+
+jobs:
+  sync-and-build:
+    runs-on: ubuntu-22.04
+
+    strategy:
+      matrix:
+        arch: [amd64]
+
+    steps:
+      - name: Install base dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl git jq ca-certificates
+
+      - name: Fetch latest Podman release tag from upstream
+        id: get_tag_podman
+        run: |
+          tag=$(curl -s https://api.github.com/repos/containers/podman/releases/latest | jq -r .tag_name)
+          version=$(echo "$tag" | sed 's/^v//')
+          echo "Ultima release: $tag"
+          echo "tag=$tag" >> $GITHUB_OUTPUT
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Clone Podman upstream source at tag
+        run: |
+          git clone --depth 1 --branch ${{ steps.get_tag_podman.outputs.tag }} https://github.com/containers/podman.git podman-source
+
+      - name: Fetch latest Conmon release tag from upstream
+        id: get_tag_conmon
+        run: |
+          tag=$(curl -s https://api.github.com/repos/containers/conmon/releases/latest | jq -r .tag_name)
+          version=$(echo "$tag" | sed 's/^v//')
+          echo "Ultima release: $tag"
+          echo "tag=$tag" >> $GITHUB_OUTPUT
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Clone Conmon upstream source at tag
+        run: |
+          git clone --depth 1 --branch ${{ steps.get_tget_tag_conmonag.outputs.tag }} https://github.com/containers/conmon.git conmon-source
+
+      - name: Fetch latest Crun release tag from upstream
+        id: get_tag_crun
+        run: |
+          tag=$(curl -s https://api.github.com/repos/containers/crun/releases/latest | jq -r .tag_name)
+          version=$(echo "$tag" | sed 's/^v//')
+          echo "Ultima release: $tag"
+          echo "tag=$tag" >> $GITHUB_OUTPUT
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Clone Crun upstream source at tag
+        run: |
+          git clone --depth 1 --branch ${{ steps.get_tget_tag_conmonag.outputs.tag }} https://github.com/containers/crun.git crun-source
