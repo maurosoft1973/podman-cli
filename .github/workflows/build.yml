@@ -60,3 +60,34 @@ jobs:
       - name: Clone Crun upstream source at tag
         run: |
           git clone --depth 1 --branch ${{ steps.get_tag_crun.outputs.tag }} https://github.com/containers/crun.git crun-source
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            btrfs-progs \
+            gcc \
+            git \
+            iptables \
+            libassuan-dev \
+            libbtrfs-dev \
+            libc6-dev \
+            libdevmapper-dev \
+            libglib2.0-dev \
+            libgpgme-dev \
+            libgpg-error-dev \
+            libprotobuf-dev \
+            libprotobuf-c-dev \
+            libseccomp-dev \
+            libselinux1-dev \
+            libsystemd-dev \
+            make \
+            containernetworking-plugins \
+            pkg-config \
+            runc \
+            uidmap
+
+      - name: Setup Go (latest version)
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.3'
