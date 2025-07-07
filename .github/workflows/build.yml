@@ -91,3 +91,19 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.23.3'
+
+      - name: Build Podman
+        working-directory: ./podman-source
+        run: |
+          PKGNAME="podman"
+          ARCH="amd64"
+          MAINTAINER="${GITHUB_ACTOR:-GitHub Actions} <mauro.cardillo@gmail.com>"
+          STAGING_DIR="../$(pwd)/pkgroot"
+          echo ">> [BUILD] Clean..."
+          mkdir -p "$STAGING_DIR/DEBIAN"
+          echo ">> [BUILD] Build Podman $VERSION..."
+          make clean
+          make podman podman-remote rootlessport quadlet docs completions
+          echo ">> [BUILD] Install to Staging dir..."
+          make install DESTDIR="$STAGING_DIR"
+          
