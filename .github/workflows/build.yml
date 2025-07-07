@@ -105,11 +105,11 @@ jobs:
         working-directory: ./podman-source
         run: |
           echo ">> [BUILD] Clean..."
-          mkdir -p "${{ steps.get_config_build.DEBIAN_DIR }}"
-          echo ">> [BUILD] Build Podman ${{ steps.get_tag_podman.version }} ..."
+          mkdir -p "${{ steps.get_config_build.outputs.DEBIAN_DIR }}"
+          echo ">> [BUILD] Build Podman ${{ steps.get_tag_podman.outputs.version }} ..."
           make clean
           make podman podman-remote rootlessport quadlet docs completions
           echo ">> [BUILD] Install to Staging dir..."
-          make install DESTDIR="${{ steps.get_config_build.STAGING_DIR }}"
-          ls -la ${{ steps.get_config_build.STAGING_DIR }}
+          make install DESTDIR="${{ steps.get_config_build.outputs.STAGING_DIR }}"
+          ls -la ${{ steps.get_config_build.outputs.STAGING_DIR }}
           
