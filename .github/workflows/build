@@ -46,7 +46,7 @@ jobs:
 
       - name: Clone Conmon upstream source at tag
         run: |
-          git clone --depth 1 --branch ${{ steps.get_tget_tag_conmonag.outputs.tag }} https://github.com/containers/conmon.git conmon-source
+          git clone --depth 1 --branch ${{ steps.get_tag_conmon.outputs.tag }} https://github.com/containers/conmon.git conmon-source
 
       - name: Fetch latest Crun release tag from upstream
         id: get_tag_crun
@@ -59,4 +59,4 @@ jobs:
 
       - name: Clone Crun upstream source at tag
         run: |
-          git clone --depth 1 --branch ${{ steps.get_tget_tag_conmonag.outputs.tag }} https://github.com/containers/crun.git crun-source
+          git clone --depth 1 --branch ${{ steps.get_tag_crun.outputs.tag }} https://github.com/containers/crun.git crun-source
