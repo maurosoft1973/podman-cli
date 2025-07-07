@@ -92,18 +92,24 @@ jobs:
         with:
           go-version: '1.23.3'
 
-      - name: Build Podman
-        working-directory: ./podman-source
+      - name: Config Build
+        id: get_config_build
         run: |
           PKGNAME="podman"
           ARCH="amd64"
           MAINTAINER="${GITHUB_ACTOR:-GitHub Actions} <mauro.cardillo@gmail.com>"
-          STAGING_DIR="../$(pwd)/pkgroot"
+          STAGING_DIR="$(pwd)/pkgroot"
+          DEBIAN_DIR="$(pwd)/pkgroot/DEBIAN"
+          
+      - name: Build Podman
+        working-directory: ./podman-source
+        run: |
           echo ">> [BUILD] Clean..."
-          mkdir -p "$STAGING_DIR/DEBIAN"
-          echo ">> [BUILD] Build Podman $VERSION..."
+          mkdir -p "${{ steps.get_config_build.DEBIAN_DIR }}"
+          echo ">> [BUILD] Build Podman ${{ steps.get_tag_podman.version }} ..."
           make clean
           make podman podman-remote rootlessport quadlet docs completions
           echo ">> [BUILD] Install to Staging dir..."
-          make install DESTDIR="$STAGING_DIR"
+          make install DESTDIR="${{ steps.get_config_build.STAGING_DIR }}"
+          ls -la ${{ steps.get_config_build.STAGING_DIR }}
           
