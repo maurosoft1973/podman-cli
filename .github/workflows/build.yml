@@ -155,7 +155,7 @@ jobs:
           echo ">> [BUILD] Generated metadata DEBIAN/"
           cat <<EOF > "${{ steps.get_config_build.outputs.STAGING_DIR }}/DEBIAN/control"
           Package: ${{ steps.get_config_build.outputs.PKGNAME }}
-          Version: ${{ steps.get_config_build.outputs.VERSION }}
+          Version: ${{ steps.get_tag_podman.outputs.version }}
           Section: admin
           Priority: optional
           Architecture: ${{ steps.get_config_build.outputs.ARCH }}
