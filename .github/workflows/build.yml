@@ -154,12 +154,12 @@ jobs:
         run: |
           echo ">> [BUILD] Generated metadata DEBIAN/"
           cat <<EOF > "${{ steps.get_config_build.outputs.STAGING_DIR }}/DEBIAN/control"
-          Package: $PKGNAME
-          Version: $VERSION
+          Package: ${{ steps.get_config_build.outputs.PKGNAME }}
+          Version: ${{ steps.get_config_build.outputs.VERSION }}
           Section: admin
           Priority: optional
-          Architecture: $ARCH
-          Maintainer: $MAINTAINER
+          Architecture: ${{ steps.get_config_build.outputs.ARCH }}
+          Maintainer: ${{ steps.get_config_build.outputs.MAINTAINER }}
           Depends: libc6 (>= 2.28), libseccomp2 (>= 2.4.0), uidmap (>= 1.4.8), libgpgme-dev (>= 1.24.2), passt (>= 0.0)
           Description: Daemonless OCI container runtime
            Podman is a daemonless container engine for developing, managing, and running OCI Containers and Pods.
