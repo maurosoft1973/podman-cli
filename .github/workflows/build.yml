@@ -68,6 +68,12 @@ jobs:
             btrfs-progs \
             gcc \
             git \
+            build-essential \
+            libtool \
+            libprotobuf-c-dev \
+            libcap-dev \
+            libseccomp-dev \
+            libyajl-dev \
             iptables \
             libassuan-dev \
             libbtrfs-dev \
@@ -81,6 +87,10 @@ jobs:
             libseccomp-dev \
             libselinux1-dev \
             libsystemd-dev \
+            go-md2man \
+            autoconf \
+            python3 \
+            automake \
             make \
             containernetworking-plugins \
             pkg-config \
@@ -138,5 +148,5 @@ jobs:
           ./autogen.sh
           ./configure
           make
-          cp bin/* "${{ steps.get_config_build.outputs.STAGING_DIR }}/usr/local/bin/"
+          cp crun "${{ steps.get_config_build.outputs.STAGING_DIR }}/usr/local/bin/"
           
