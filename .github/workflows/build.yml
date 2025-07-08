@@ -109,12 +109,34 @@ jobs:
       - name: Build Podman
         working-directory: ./podman-source
         run: |
-          echo ">> [BUILD] Clean..."
           mkdir -p "${{ steps.get_config_build.outputs.DEBIAN_DIR }}"
-          echo ">> [BUILD] Build Podman ${{ steps.get_tag_podman.outputs.version }} ..."
+          echo ">> [BUILD] Clean..."
           make clean
-          make podman podman-remote rootlessport quadlet docs completions
+          echo ">> [BUILD] Build Podman ${{ steps.get_tag_podman.outputs.version }} ..."
+          make BUILDTAGS="seccomp apparmor systemd" podman podman-remote rootlessport quadlet docs completions
           echo ">> [BUILD] Install to Staging dir..."
           make install DESTDIR="${{ steps.get_config_build.outputs.STAGING_DIR }}"
-          ls -la ${{ steps.get_config_build.outputs.STAGING_DIR }}
+          echo ">> [BUILD] Aggiunta configurazioni di default..."
+          mkdir -p "${{ steps.get_config_build.outputs.STAGING_DIR }}/etc/containers"
+          mkdir -p "${{ steps.get_config_build.outputs.STAGING_DIR }}/usr/share/containers"
+          wget https://raw.githubusercontent.com/containers/image/main/registries.conf -O "${{ steps.get_config_build.outputs.STAGING_DIR }}/etc/containers/registries.conf"
+          wget https://raw.githubusercontent.com/containers/common/main/pkg/subscriptions/mounts.conf -O "${{ steps.get_config_build.outputs.STAGING_DIR }}/usr/share/containers/mounts.conf"
+          wget https://raw.githubusercontent.com/containers/image/main/default-policy.json  -O "${{ steps.get_config_build.outputs.STAGING_DIR }}/etc/containers/policy.json"
+          echo ">> [BUILD] Added unit systemd..."
+          mkdir -p "${{ steps.get_config_build.outputs.STAGING_DIR }}/lib/systemd/system"
+          cp contrib/systemd/system/podman.* "${{ steps.get_config_build.outputs.STAGING_DIR }}/lib/systemd/system/"
+
+      - name: Build Conmon
+        working-directory: ./conmon-source
+        run: |
+          make
+          cp bin/* "${{ steps.get_config_build.outputs.STAGING_DIR }}/usr/local/bin/"
+
+      - name: Build Conmon
+        working-directory: ./crun-source
+        run: |
+          ./autogen.sh
+          ./configure
+          make
+          cp bin/* "${{ steps.get_config_build.outputs.STAGING_DIR }}/usr/local/bin/"
           
